@@ -88,8 +88,13 @@ class TSSModel(object):
                 (cell_output, state) = cell(inputs[:, time_step, :], state)
                 outputs.append(cell_output)
 
+        # Weight our super inbalanced class:
 
-        loss = tf.reduce_mean(tf.nn.sparse_softmax_cross_entropy_with_logits(outputs, self._targets))
+        ratio = 1.0 / config.num_steps
+        class_weight = tf.constant([ratio, 1.0 - ratio])
+        weighted_outputs = tf.mul(outputs, class_weight)  # shape [batch_size, 2]
+
+        loss = tf.reduce_mean(tf.nn.sparse_softmax_cross_entropy_with_logits(weighted_outputs, self._targets))
 
         self._cost = cost = loss
         self._final_state = state
