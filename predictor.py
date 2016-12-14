@@ -93,6 +93,7 @@ class TSSModel(object):
 
         self._cost = cost = loss
         self._final_state = state
+        self._final_output = tf.nn.softmax(outputs)
 
         if not is_training:
             return
@@ -170,7 +171,7 @@ class TestConfig(object):
     num_classes = 4
 
 
-def run_epoch(session, m, data, eval_op, writer, merged, verbose=False):
+def run_epoch(session, m, data, eval_op, writer, merged, windowsize, verbose=False):
     """Runs the model on the given data."""
     epoch_size = ((len(data) // m.batch_size) - 1) // m.num_steps
     start_time = time.time()
@@ -180,16 +181,16 @@ def run_epoch(session, m, data, eval_op, writer, merged, verbose=False):
     for step, (x, y) in enumerate(reader.promoter_iterator(data, m.batch_size,
                                                       m.num_steps)):
 
-        cost, state, summary, _ = session.run([m.cost, m.final_state, merged, eval_op],
+        cost, state, summary, final_output, _ = session.run([m.cost, m.final_state, merged, m._final_output, eval_op],
                                      {m.input_data: x,
                                       m.targets: y,
                                       m.initial_state: state})
         costs += cost
         iters += m.num_steps
-        if step % 10 == 0:
-            writer.add_summary(summary, step)
         print(cost)
-
+        if step % windowsize == 0:
+            print(final_output)
+            writer.add_summary(summary, step)
 
     return costs
 
@@ -241,7 +242,7 @@ def main(_):
             m.assign_lr(session, config.learning_rate * lr_decay)
 
             print("Epoch: %d Learning rate: %.3f" % (i + 1, session.run(m.lr)))
-            loss = run_epoch(session, m, train_data, m.train_op, writer, merged, verbose=True)
+            loss = run_epoch(session, m, train_data, m.train_op, writer, merged, config.num_steps, verbose=True)
 
             save_path = saver.save(session, "/tmp/model.ckpt")
             print("Model saved in file: %s" % save_path)
