@@ -76,17 +76,17 @@ class TSSModel(object):
         #
         # The alternative version of the code below is:
         #
-        # from tensorflow.models.rnn import rnn
-        # inputs = [tf.squeeze(input_, [1])
-        #           for input_ in tf.split(1, num_steps, inputs)]
-        # outputs, state = rnn.rnn(cell, inputs, initial_state=self._initial_state)
-        outputs = []
-        state = self._initial_state
-        with tf.variable_scope("RNN"):
-            for time_step in range(num_steps):
-                if time_step > 0: tf.get_variable_scope().reuse_variables()
-                (cell_output, state) = cell(inputs[:, time_step, :], state)
-                outputs.append(cell_output)
+
+        inputs = [tf.squeeze(input_, [1])
+                  for input_ in tf.split(1, num_steps, inputs)]
+        outputs, state = tf.nn.rnn(cell, inputs, initial_state=self._initial_state)
+        # outputs = []
+        # state = self._initial_state
+        # with tf.variable_scope("RNN"):
+        #     for time_step in range(num_steps):
+        #         if time_step > 0: tf.get_variable_scope().reuse_variables()
+        #         (cell_output, state) = cell(inputs[:, time_step, :], state)
+        #         outputs.append(cell_output)
 
         # Weight our super inbalanced class:
 
@@ -148,12 +148,12 @@ class LargeConfig(object):
     learning_rate = 1.0
     max_grad_norm = 10
     num_layers = 2
-    num_steps = 50
-    max_epoch = 6
-    max_max_epoch = 6
+    num_steps = 100
+    max_epoch = 1000
+    max_max_epoch = 1000
     keep_prob = 1.0 #0.5
-    lr_decay = 0.5 #1 / 1.15
-    batch_size = 500
+    lr_decay = 1 / 1.15
+    batch_size = 50
 
     # ATGC
     num_classes = 4
@@ -164,7 +164,7 @@ class TestConfig(object):
     init_scale = 0.1
     learning_rate = 1.0
     max_grad_norm = 10.0
-    num_layers = 2
+    num_layers = 5
     num_steps = 50
     max_epoch = 10
     max_max_epoch = 10
