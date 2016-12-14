@@ -98,7 +98,7 @@ class TSSModel(object):
 
         self._cost = cost = loss
         self._final_state = state
-        self._final_output = tf.nn.softmax(outputs)
+        self._final_output = tf.nn.softmax(weighted_outputs)
 
         if not is_training:
             return
