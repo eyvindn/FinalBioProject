@@ -148,12 +148,12 @@ class LargeConfig(object):
     learning_rate = 1.0
     max_grad_norm = 10
     num_layers = 2
-    num_steps = 500
+    num_steps = 50
     max_epoch = 6
     max_max_epoch = 6
-    keep_prob = 0.5
-    lr_decay = 1 / 1.15
-    batch_size = 100
+    keep_prob = 1.0 #0.5
+    lr_decay = 0.5 #1 / 1.15
+    batch_size = 500
 
     # ATGC
     num_classes = 4
@@ -163,11 +163,11 @@ class TestConfig(object):
     """Tiny config, for testing."""
     init_scale = 0.1
     learning_rate = 1.0
-    max_grad_norm = 1
-    num_layers = 1
+    max_grad_norm = 10.0
+    num_layers = 2
     num_steps = 50
-    max_epoch = 1
-    max_max_epoch = 1
+    max_epoch = 10
+    max_max_epoch = 10
     keep_prob = 1.0
     lr_decay = 0.5
     batch_size = 40
